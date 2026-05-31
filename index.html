@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yaren & Kürşat — Fotoğraflarını Paylaş</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f5f0e8;
+      --dark: #2a2319;
+      --olive: #4a5240;
+      --olive-light: #6b7260;
+      --accent: #8a7560;
+      --white: #fffef9;
+      --border: rgba(74, 82, 64, 0.2);
+    }
+
+    body {
+      background-color: var(--cream);
+      color: var(--dark);
+      font-family: 'Jost', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-top: 1.5rem;
+    }
+
+    .header-date {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      color: var(--olive-light);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .header-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 8vw, 3.5rem);
+      font-weight: 400;
+      color: var(--olive);
+      line-height: 1.1;
+    }
+
+    .header-names em {
+      font-style: italic;
+      font-size: 0.65em;
+      display: block;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .header-sub {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.9rem;
+      color: var(--olive-light);
+      margin-top: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0 auto 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+    .divider-icon {
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    /* ── Upload Card ── */
+    .card {
+      background: var(--white);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    /* ── Drop Zone ── */
+    .drop-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .drop-zone.dragover {
+      border-color: var(--olive);
+      background: rgba(74, 82, 64, 0.04);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 1rem;
+      color: var(--olive-light);
+    }
+
+    .drop-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      color: var(--olive);
+      margin-bottom: 0.4rem;
+    }
+
+    .drop-sub {
+      font-size: 0.8rem;
+      color: var(--olive-light);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Preview Grid ── */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 1.25rem;
+    }
+
+    .preview-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: var(--cream);
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-item .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(42, 35, 25, 0.7);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* ── Name Field ── */
+    .field {
+      margin-top: 1.25rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--olive-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--cream);
+      color: var(--dark);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--olive);
+    }
+
+    /* ── Submit Button ── */
+    .submit-btn {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--olive);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:hover { background: #3a4132; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled {
+      background: var(--accent);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .progress-bar-bg {
+      background: var(--cream);
+      border-radius: 99px;
+      height: 4px;
+      overflow: hidden;
+      border: 0.5px solid var(--border);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--olive);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .progress-label {
+      font-size: 0.78rem;
+      color: var(--olive-light);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    /* ── Success State ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .success-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      color: var(--olive);
+      margin-bottom: 0.5rem;
+    }
+
+    .success-sub {
+      font-size: 0.88rem;
+      color: var(--olive-light);
+    }
+
+    .upload-more-btn {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.5rem;
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--olive);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--olive-light);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-date">20 Haziran 2026</div>
+    <div class="header-names">
+      Yaren
+      <em>ve</em>
+      Kürşat
+    </div>
+    <div class="header-sub">Çektiğiniz anları bizimle paylaşın</div>
+  </div>
+
+  <div class="divider">
+    <span class="divider-icon">♡</span>
+  </div>
+
+  <div class="card">
+    <div id="upload-form">
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple />
+        <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <div class="drop-title">Fotoğraf veya Video Seç</div>
+        <div class="drop-sub">Telefon galerinizden seçin veya buraya sürükleyin</div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <!-- Name Field (optional) -->
+      <div class="field">
+        <label for="guestName">Adınız (isteğe bağlı)</label>
+        <input type="text" id="guestName" placeholder="Misafir adı..." autocomplete="name" />
+      </div>
+
+      <!-- Submit -->
+      <button class="submit-btn" id="submitBtn" disabled>Fotoğrafları Gönder</button>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">Hazırlanıyor...</div>
+      </div>
+
+    </div>
+
+    <!-- Success -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">🌿</div>
+      <div class="success-title">Teşekkürler!</div>
+      <div class="success-sub">Fotoğraflarınız güvenle kaydedildi.<br>Bu anları bizimle paylaştığınız için çok mutluyuz.</div>
+      <button class="upload-more-btn" onclick="resetForm()">Daha Fazla Yükle</button>
+    </div>
+  </div>
+
+  <div class="footer">YAREN & KÜRŞAT &nbsp;·&nbsp; FOT OĞRAFLARINIZ İÇİN TEŞEKKÜRLER ♡</div>
+
+  <script>
+    // ============================================================
+    // ⚠️  BURAYA APPS SCRIPT URL'İNİ YAPIŞTIRINIZ
+    // Adım: script.google.com → Deploy → Web App → URL kopyala
+    // ============================================================
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzeLiYt0tTbpWK8KeqfikUreDoWg7j-IdwLGVu7vC45zh7CCcOMDH-ItiZ1aT67qgYY0Q/exec";
+    // ============================================================
+
+    let selectedFiles = [];
+
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const previewGrid = document.getElementById('previewGrid');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar = document.getElementById('progressBar');
+    const progressLabel = document.getElementById('progressLabel');
+
+    fileInput.addEventListener('change', handleFiles);
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFiles({ target: { files: e.dataTransfer.files } });
+    });
+
+    function handleFiles(e) {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        if (!selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
+          selectedFiles.push(file);
+        }
+      });
+      renderPreviews();
+      submitBtn.disabled = selectedFiles.length === 0;
+    }
+
+    function renderPreviews() {
+      previewGrid.innerHTML = '';
+      selectedFiles.forEach((file, idx) => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          item.appendChild(img);
+        } else {
+          const lbl = document.createElement('div');
+          lbl.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--olive-light);text-align:center;padding:4px';
+          lbl.textContent = '🎥 ' + file.name.substring(0, 12);
+          item.appendChild(lbl);
+        }
+
+        const rm = document.createElement('button');
+        rm.className = 'remove-btn';
+        rm.textContent = '×';
+        rm.onclick = () => { selectedFiles.splice(idx, 1); renderPreviews(); submitBtn.disabled = selectedFiles.length === 0; };
+        item.appendChild(rm);
+        previewGrid.appendChild(item);
+      });
+    }
+
+    async function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    submitBtn.addEventListener('click', async () => {
+      if (!selectedFiles.length) return;
+
+      if (WEB_APP_URL === "BURAYA_APPS_SCRIPT_URL_YAPISTIR") {
+        alert("⚠️ Lütfen önce Google Apps Script URL'ini HTML dosyasına ekleyin.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      progressWrap.style.display = 'block';
+
+      const guestName = document.getElementById('guestName').value.trim() || 'Misafir';
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+
+      let uploaded = 0;
+
+      for (const file of selectedFiles) {
+        progressLabel.textContent = `Yükleniyor: ${uploaded + 1} / ${selectedFiles.length}`;
+        progressBar.style.width = `${(uploaded / selectedFiles.length) * 100}%`;
+
+        try {
+          const base64 = await fileToBase64(file);
+          const ext = file.name.split('.').pop();
+          const fileName = `${guestName}_${timestamp}_${uploaded + 1}.${ext}`;
+
+          await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              file: base64,
+              mimeType: file.type,
+              fileName: fileName
+            })
+          });
+        } catch (err) {
+          console.error('Yükleme hatası:', err);
+        }
+
+        uploaded++;
+        progressBar.style.width = `${(uploaded / selectedFiles.length) * 100}%`;
+      }
+
+      progressLabel.textContent = 'Tamamlandı!';
+      setTimeout(() => {
+        document.getElementById('upload-form').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+      }, 500);
+    });
+
+    function resetForm() {
+      selectedFiles = [];
+      previewGrid.innerHTML = '';
+      submitBtn.disabled = true;
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+      document.getElementById('guestName').value = '';
+      document.getElementById('successScreen').style.display = 'none';
+      document.getElementById('upload-form').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
